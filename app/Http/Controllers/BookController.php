@@ -10,13 +10,15 @@ class BookController extends Controller
     // Hiển thị danh sách sách
     public function index()
     {
-        return Book::all();
+        $books = Book::with('category')->get();
+        return view('books.index', compact('books'));
     }
 
     // Xem chi tiết 1 sách
     public function show($id)
     {
-        return Book::findOrFail($id);
+        $book = Book::findOrFail($id);
+        return view('books.show', compact('book'));
     }
 
     // Thêm sách mới
