@@ -8,11 +8,21 @@ use Illuminate\Http\Request;
 class BookController extends Controller
 {
     // Hiển thị danh sách sách
-    public function index()
-    {
-        $books = Book::with('category')->get();
-        return view('books.index', compact('books'));
+    public function index(Request $request)
+{
+    $query = Book::with('category');
+
+    // Nếu người dùng nhập từ khóa tìm kiếm
+    if ($request->has('search') && $request->search != '') {
+        $query->where('title', 'like', '%' . $request->search . '%')
+              ->orWhere('author', 'like', '%' . $request->search . '%');
     }
+
+    $books = $query->get();
+
+    return view('books.index', compact('books'));
+}
+
 
     // Xem chi tiết 1 sách
     public function show($id)
