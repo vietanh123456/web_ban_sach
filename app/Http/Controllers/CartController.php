@@ -40,7 +40,8 @@ class CartController extends Controller
             CartItem::create([
                 'book_id' => $book->id,
                 'quantity' => 1,
-            ]);
+        ]);
+
         }
 
         // Quay lại trang trước kèm thông báo

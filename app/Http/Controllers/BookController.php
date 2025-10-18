@@ -3,25 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
     // Hiển thị danh sách sách
     public function index(Request $request)
-{
-    $query = Book::with('category');
+    {
+        $query = Book::with('category');
 
-    // Nếu người dùng nhập từ khóa tìm kiếm
-    if ($request->has('search') && $request->search != '') {
-        $query->where('title', 'like', '%' . $request->search . '%')
-              ->orWhere('author', 'like', '%' . $request->search . '%');
+        // Lọc theo từ khóa
+        if ($request->has('search') && $request->search != '') {
+            $query->where(function($q) use ($request) {
+                $q->where('title', 'like', '%' . $request->search . '%')
+                  ->orWhere('author', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        // Lọc theo thể loại (category_id)
+        if ($request->has('category_id') && $request->category_id != '') {
+            $query->where('category_id', $request->category_id);
+        }
+
+        $books = $query->get();
+        $categories = Category::all(); // lấy danh sách thể loại
+
+        return view('books.index', compact('books', 'categories'));
     }
-
-    $books = $query->get();
-
-    return view('books.index', compact('books'));
-}
 
 
     // Xem chi tiết 1 sách
