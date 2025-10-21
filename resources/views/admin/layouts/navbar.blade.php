@@ -7,13 +7,9 @@
           📚 <span>Bookstore</span>
         </a>
         <div class="hidden md:flex items-center gap-6 text-sm text-gray-600">
-          <a href="{{ route('home') }}" class="hover:text-gray-900">Trang chủ</a>
+          <a href="{{ url('/') }}" class="hover:text-gray-900">Trang chủ</a>
           <a href="{{ route('books.index') }}" class="hover:text-gray-900">Sách</a>
-          <a href="{{ route('cart.index') }}" class="hover:text-gray-900">Giỏ hàng
-            @if(($cartCount ?? 0) > 0)
-              <span class="ml-1 rounded-full bg-blue-600 px-2 py-0.5 text-xs text-white align-middle">{{ $cartCount }}</span>
-            @endif
-          </a>
+          <a href="{{ route('cart.index') }}" class="hover:text-gray-900">Giỏ hàng</a>
         </div>
       </div>
 
@@ -23,7 +19,9 @@
           <span class="hidden sm:inline text-sm text-gray-700">Hi, {{ Auth::user()->name }}</span>
           <form method="POST" action="{{ route('logout') }}">
             @csrf
-            <button class="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">Đăng xuất</button>
+            <button class="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+              Đăng xuất
+            </button>
           </form>
         @else
           <a href="{{ route('login') }}"

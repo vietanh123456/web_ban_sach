@@ -8,96 +8,85 @@ use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
-    /**
-     * Hiển thị danh sách sản phẩm trong giỏ hàng
-     */
+    // Xem giỏ hàng
     public function index()
     {
-        // Nếu có đăng nhập, lấy giỏ hàng theo user; nếu chưa, tạm mặc định user_id = 1
         $userId = auth()->id() ?? 1;
 
         $cartItems = CartItem::with('book')
             ->where('user_id', $userId)
             ->get();
 
-        return view('cart.index', compact('cartItems'));
+        $total = $cartItems->sum(fn ($i) => (int)$i->book->price * (int)$i->quantity);
+
+        return view('cart.index', compact('cartItems', 'total'));
     }
 
-    /**
-     * Thêm một sản phẩm vào giỏ hàng
-     */
+    // Thêm 1 sản phẩm theo book_id
     public function add($id)
     {
-        $userId = auth()->id() ?? 1; // Nếu chưa có login, mặc định user_id = 1
-        $book = Book::findOrFail($id);
+        $userId = auth()->id() ?? 1;
+        $book   = Book::findOrFail($id);
 
-        // Kiểm tra xem sản phẩm đã có trong giỏ chưa
         $item = CartItem::where('book_id', $book->id)
-            ->where('user_id', $userId)
-            ->first();
+                        ->where('user_id', $userId)
+                        ->first();
 
         if ($item) {
-            // Nếu có, tăng số lượng
             $item->quantity += 1;
             $item->save();
         } else {
-            // Nếu chưa, tạo mới
             CartItem::create([
-                'user_id' => $userId,
-                'book_id' => $book->id,
+                'user_id'  => $userId,
+                'book_id'  => $book->id,
                 'quantity' => 1,
             ]);
         }
 
-        return redirect()->back()->with('success', 'Đã thêm "' . $book->title . '" vào giỏ hàng!');
+        return redirect()->route('cart.index')
+    ->with('success', 'Đã thêm "' . $book->title . '" vào giỏ!');
+
     }
 
-    /**
-     * Giảm số lượng hoặc xóa sản phẩm khỏi giỏ hàng
-     */
+    // Cập nhật số lượng (PUT)
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'quantity' => ['required', 'integer', 'min:1'],
+        ]);
+
+        $userId = auth()->id() ?? 1;
+
+        $item = CartItem::where('id', $id)
+                        ->where('user_id', $userId)
+                        ->firstOrFail();
+
+        $item->quantity = (int)$request->quantity;
+        $item->save();
+
+        return back()->with('success', 'Đã cập nhật số lượng.');
+    }
+
+    // Xoá hẳn 1 item (DELETE)
     public function remove($id)
     {
         $userId = auth()->id() ?? 1;
 
         $item = CartItem::where('id', $id)
-            ->where('user_id', $userId)
-            ->firstOrFail();
-
-        if ($item->quantity > 1) {
-            $item->quantity -= 1;
-            $item->save();
-        } else {
-            $item->delete();
-        }
-
-        return redirect()->back()->with('success', 'Đã cập nhật giỏ hàng!');
-    }
-
-    /**
-     * Xóa hẳn một sản phẩm khỏi giỏ hàng
-     */
-    public function delete($id)
-    {
-        $userId = auth()->id() ?? 1;
-
-        $item = CartItem::where('id', $id)
-            ->where('user_id', $userId)
-            ->firstOrFail();
+                        ->where('user_id', $userId)
+                        ->firstOrFail();
 
         $item->delete();
 
-        return redirect()->back()->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng!');
+        return back()->with('success', 'Đã xoá sản phẩm khỏi giỏ.');
     }
 
-    /**
-     * Xóa toàn bộ giỏ hàng của user
-     */
+    // Xoá toàn bộ giỏ (DELETE)
     public function clear()
     {
         $userId = auth()->id() ?? 1;
-
         CartItem::where('user_id', $userId)->delete();
 
-        return redirect()->back()->with('success', 'Giỏ hàng đã được làm trống!');
+        return back()->with('success', 'Đã làm trống giỏ hàng.');
     }
 }
