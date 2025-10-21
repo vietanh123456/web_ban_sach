@@ -13,10 +13,13 @@ class CartController extends Controller
      */
     public function index()
     {
-        // Lấy tất cả các mục trong giỏ hàng kèm thông tin sách
-        $cartItems = CartItem::with('book')->get();
+        // Nếu có đăng nhập, lấy giỏ hàng theo user; nếu chưa, tạm mặc định user_id = 1
+        $userId = auth()->id() ?? 1;
 
-        // Trả dữ liệu về view cart/index.blade.php
+        $cartItems = CartItem::with('book')
+            ->where('user_id', $userId)
+            ->get();
+
         return view('cart.index', compact('cartItems'));
     }
 
@@ -25,26 +28,27 @@ class CartController extends Controller
      */
     public function add($id)
     {
-        // Tìm sách theo ID
+        $userId = auth()->id() ?? 1; // Nếu chưa có login, mặc định user_id = 1
         $book = Book::findOrFail($id);
 
-        // Kiểm tra xem sách này đã có trong giỏ hàng chưa
-        $item = CartItem::where('book_id', $book->id)->first();
+        // Kiểm tra xem sản phẩm đã có trong giỏ chưa
+        $item = CartItem::where('book_id', $book->id)
+            ->where('user_id', $userId)
+            ->first();
 
         if ($item) {
-            // Nếu đã có, tăng số lượng thêm 1
+            // Nếu có, tăng số lượng
             $item->quantity += 1;
             $item->save();
         } else {
-            // Nếu chưa có, tạo mới
+            // Nếu chưa, tạo mới
             CartItem::create([
+                'user_id' => $userId,
                 'book_id' => $book->id,
                 'quantity' => 1,
-        ]);
-
+            ]);
         }
 
-        // Quay lại trang trước kèm thông báo
         return redirect()->back()->with('success', 'Đã thêm "' . $book->title . '" vào giỏ hàng!');
     }
 
@@ -53,14 +57,16 @@ class CartController extends Controller
      */
     public function remove($id)
     {
-        $item = CartItem::findOrFail($id);
+        $userId = auth()->id() ?? 1;
+
+        $item = CartItem::where('id', $id)
+            ->where('user_id', $userId)
+            ->firstOrFail();
 
         if ($item->quantity > 1) {
-            // Nếu còn hơn 1, giảm 1
             $item->quantity -= 1;
             $item->save();
         } else {
-            // Nếu chỉ còn 1, xóa luôn
             $item->delete();
         }
 
@@ -68,22 +74,30 @@ class CartController extends Controller
     }
 
     /**
-     * Xóa hẳn sản phẩm khỏi giỏ hàng
+     * Xóa hẳn một sản phẩm khỏi giỏ hàng
      */
     public function delete($id)
     {
-        $item = CartItem::findOrFail($id);
+        $userId = auth()->id() ?? 1;
+
+        $item = CartItem::where('id', $id)
+            ->where('user_id', $userId)
+            ->firstOrFail();
+
         $item->delete();
 
         return redirect()->back()->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng!');
     }
 
     /**
-     * Xóa toàn bộ giỏ hàng
+     * Xóa toàn bộ giỏ hàng của user
      */
     public function clear()
     {
-        CartItem::truncate(); // Xóa hết dữ liệu trong bảng cart_items
+        $userId = auth()->id() ?? 1;
+
+        CartItem::where('user_id', $userId)->delete();
+
         return redirect()->back()->with('success', 'Giỏ hàng đã được làm trống!');
     }
 }

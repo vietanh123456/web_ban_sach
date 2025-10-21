@@ -7,20 +7,20 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Chạy migration: tạo bảng categories.
      */
     public function up(): void
     {
         Schema::create('categories', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->timestamps();
-});
-
+            $table->id(); // Khóa chính tự tăng
+            $table->string('name'); // Tên danh mục
+            $table->text('description')->nullable(); // Mô tả (có thể bỏ trống)
+            $table->timestamps(); // created_at & updated_at
+        });
     }
 
     /**
-     * Reverse the migrations.
+     * Hoàn tác migration (xóa bảng categories).
      */
     public function down(): void
     {
