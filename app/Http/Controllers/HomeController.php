@@ -7,9 +7,13 @@ use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $books = Book::latest()->take(6)->get();
+        $books = Book::with('category')
+            ->latest('id')
+            ->paginate(12)           // 12 cuốn mỗi trang
+            ->withQueryString();     // giữ query nếu sau này có filter/search
+
         return view('home', compact('books'));
     }
 }

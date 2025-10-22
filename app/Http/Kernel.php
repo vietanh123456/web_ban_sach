@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\Kernel as HttpKernel;
 class Kernel extends HttpKernel
 {
     /**
-     * 🌐 Các middleware toàn cục — chạy cho mọi request.
+     * 🌐 Middleware toàn cục — chạy cho mọi request.
      */
     protected $middleware = [
         \App\Http\Middleware\TrustProxies::class,
@@ -38,20 +38,21 @@ class Kernel extends HttpKernel
     ];
 
     /**
-     * 🎯 Đăng ký middleware riêng lẻ (gọi bằng tên trong route).
+     * 🎯 Đăng ký alias cho middleware (Laravel 11/12).
+     * Dùng các key này trong route: 'auth', 'isAdmin', ...
      */
-    protected $routeMiddleware = [
-        'auth' => \App\Http\Middleware\Authenticate::class,
-        'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
-        'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
-        'can' => \Illuminate\Auth\Middleware\Authorize::class,
-        'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
-        'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
-        'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
-        'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
-        'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+    protected $middlewareAliases = [
+        'auth'              => \App\Http\Middleware\Authenticate::class,
+        'auth.basic'        => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
+        'cache.headers'     => \Illuminate\Http\Middleware\SetCacheHeaders::class,
+        'can'               => \Illuminate\Auth\Middleware\Authorize::class,
+        'guest'             => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        'password.confirm'  => \Illuminate\Auth\Middleware\RequirePassword::class,
+        'signed'            => \Illuminate\Routing\Middleware\ValidateSignature::class,
+        'throttle'          => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+        'verified'          => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
 
         // ✅ Middleware kiểm tra quyền admin
-        'isAdmin' => \App\Http\Middleware\IsAdmin::class,
+        'isAdmin'           => \App\Http\Middleware\IsAdmin::class,
     ];
 }
