@@ -46,13 +46,19 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach($books as $book)
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 hover:shadow-md transition">
-                    <img src="{{ $book->image_url ?? 'https://via.placeholder.com/150x200?text=Book' }}" 
-                         alt="{{ $book->title }}" 
-                         class="w-full h-56 object-cover rounded-lg mb-3">
+                    
+                    <!-- 🖼️ Hiển thị ảnh từ public/images/... -->
+                    <img 
+                        src="{{ $book->image ? asset($book->image) : 'https://via.placeholder.com/150x200?text=No+Image' }}" 
+                        alt="{{ $book->title }}" 
+                        class="w-full h-56 object-cover rounded-lg mb-3"
+                    >
+
                     <h2 class="font-semibold text-lg text-gray-900">{{ $book->title }}</h2>
                     <p class="text-sm text-gray-500">Tác giả: {{ $book->author }}</p>
                     <p class="text-xs text-gray-400">Thể loại: {{ $book->category->name ?? 'Chưa phân loại' }}</p>
                     <p class="text-blue-600 font-semibold mt-2">{{ number_format($book->price, 0, ',', '.') }} ₫</p>
+
                     <a href="{{ route('books.show', $book->id) }}" 
                        class="inline-block mt-3 bg-blue-600 text-white px-3 py-1.5 rounded-md hover:bg-blue-700 transition">
                         Xem chi tiết

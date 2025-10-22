@@ -6,9 +6,7 @@ use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
 {
-    /**
-     * 🌐 Middleware toàn cục — chạy cho mọi request.
-     */
+    // chạy cho mọi request
     protected $middleware = [
         \App\Http\Middleware\TrustProxies::class,
         \Illuminate\Http\Middleware\HandleCors::class,
@@ -18,9 +16,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
     ];
 
-    /**
-     * 🧩 Nhóm middleware cho web và api.
-     */
+    // nhóm web/api
     protected $middlewareGroups = [
         'web' => [
             \App\Http\Middleware\EncryptCookies::class,
@@ -30,17 +26,13 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
-
         'api' => [
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
 
-    /**
-     * 🎯 Đăng ký alias cho middleware (Laravel 11/12).
-     * Dùng các key này trong route: 'auth', 'isAdmin', ...
-     */
+    // alias middleware (dùng trong route)
     protected $middlewareAliases = [
         'auth'              => \App\Http\Middleware\Authenticate::class,
         'auth.basic'        => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
@@ -52,7 +44,7 @@ class Kernel extends HttpKernel
         'throttle'          => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified'          => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
 
-        // ✅ Middleware kiểm tra quyền admin
-        'isAdmin'           => \App\Http\Middleware\IsAdmin::class,
+        // ✅ kiểm tra quyền admin
+        'isAdmin'           => \App\Http\Middleware\IsAdmin2::class,
     ];
 }

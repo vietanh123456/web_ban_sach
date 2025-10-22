@@ -3,7 +3,6 @@
 @section('title', 'Trang chủ - Bookstore')
 
 @push('styles')
-{{-- Nếu bạn dùng CDN Tailwind, thêm clamp "fake" cho tiêu đề 2 dòng --}}
 <style>
   .line-clamp-2{
     display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
@@ -12,6 +11,11 @@
 @endpush
 
 @section('content')
+  @php
+    // Đặt sẵn placeholder (đặt file này tại public/images/placeholder-book-3x4.jpg)
+    $placeholder = asset('images/placeholder-book-3x4.jpg');
+  @endphp
+
   <div class="text-center mb-10">
     <h1 class="text-3xl font-bold text-gray-800 mb-2">Chào mừng đến với Bookstore 📚</h1>
     <p class="text-gray-600">Khám phá kho tàng tri thức phong phú của chúng tôi</p>
@@ -33,9 +37,12 @@
           <a href="{{ route('books.show', $book->id) }}" class="block">
             <div class="relative w-full aspect-[3/4] bg-gray-50">
               <img
-                src="{{ $book->cover_url ?? 'https://via.placeholder.com/600x800?text=Book+Cover' }}"
+                src="{{ $book->cover_url ?: $placeholder }}"
                 alt="{{ $book->title }}"
+                loading="lazy"
+                decoding="async"
                 class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                onerror="this.onerror=null;this.src='{{ $placeholder }}';"
               />
             </div>
           </a>
@@ -75,10 +82,12 @@
       @endforeach
     </div>
 
-    {{-- Phân trang --}}
-    <div class="mt-8">
-      {{ $books->onEachSide(1)->links() }}
-    </div>
+    {{-- Phân trang (nếu $books là paginator) --}}
+    @if(method_exists($books, 'links'))
+      <div class="mt-8">
+        {{ $books->onEachSide(1)->links() }}
+      </div>
+    @endif
   @else
     <p class="text-center text-gray-500 mt-10">Hiện chưa có sách nào trong cửa hàng.</p>
   @endif
